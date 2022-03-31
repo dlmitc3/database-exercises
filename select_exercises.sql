@@ -20,10 +20,30 @@ SELECT max(release_date) FROM albums; # What is the most recent release date?
 
 SELECT * FROM albums where artist = 'Pink Floyd';  # The name of all albums by Pink Floyd
 
-# The year Sgt. Pepper's Lonely Hearts Club Band was released
-
-SELECT * FROM albums where artist = 'Pink Floyd'; 
-
-SELECT release_date 
+SELECT release_date # The year Sgt. Pepper's Lonely Hearts Club Band was released
 FROM albums 
-where name = "Sgt. Pepper's Lonely Hearts Club Band"
+where name = "Sgt. Pepper's Lonely Hearts Club Band";
+
+# The genre for the album Nevermind
+
+SELECT genre FROM albums WHERE name = 'Nevermind';
+
+# Which albums were released in the 1990s
+
+SELECT name AS '90s music' FROM albums WHERE release_date BETWEEN 1990 AND 1999;
+
+# Which albums had less than 20 million certified sales
+
+SELECT name AS 'Under 20 mil. sales' FROM albums WHERE sales <= 20;
+
+# All the albums with a genre of "Rock". 
+
+SELECT name AS 'Albums with Rock genre' from albums WHERE genre = 'Rock' || genre ='Hard Rock' || genre ='Progressive Rock';
+
+
+# Why do these query results not include albums with a genre of "Hard rock" or "Progressive rock"?
+
+
+
+
+
