@@ -1,4 +1,5 @@
 USE employees;
+SELECT database();
 
 ## 1. Create a new SQL script named limit_exercises.sql.
 
@@ -38,7 +39,7 @@ Where hire_date Like '%199%'
 And birth_date Like '%12-25%'
 ORDER BY hire_date ASC
 Limit 5 
-Offset 50;
+Offset 45;
 
 # LIMIT and OFFSET can be used to create multiple pages of data. 
 # What is the relationship between OFFSET (number of results to skip), LIMIT (number of results per page), and the page number?
