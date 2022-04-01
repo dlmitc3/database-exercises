@@ -45,9 +45,11 @@ and the last two digits of the year that they were born.
 Below is an example of what the first 10 rows will look like:*/
 
 
-Select LOWER(CONCAT(substr(first_name,1,1)||last_name,1,4)) "_" ,
-SUBSTR(Birth_date, 6, 2),
-SUBSTR(Birth_date, 3,2)
+select lower(concat(
+    substr(first_name, 1, 1), 
+    substr(last_name, 1, 4),
+		 "_",
+		 substr(birth_date, 6, 2),
+		 substr(birth_date, 3, 2)
+)) as username,first_name, last_name, birth_date
 from employees;
-
-
