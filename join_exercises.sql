@@ -6,23 +6,51 @@ use join_example_db;
 
 select *
 from users;
+/*'1','bob','bob@example.com','1'
+'2','joe','joe@example.com','2'
+'3','sally','sally@example.com','3'
+'4','adam','adam@example.com','3'
+'5','jane','jane@example.com',NULL
+'6','mike','mike@example.com',NULL
+*/
 
 select *
 from roles;
+/*'2','author'
+'3','reviewer'
+'4','commenter'*/
+
 
 # 2. Use join, left join, and right join to combine results from the users and roles tables
 
 SELECT *
 from users
 join roles on users.role_id = roles.id;
+/*'2','joe','joe@example.com','2','2','author'
+'3','sally','sally@example.com','3','3','reviewer'
+'4','adam','adam@example.com','3','3','reviewer'*/
+
 
 SELECT *
 from users
 left join roles on users.role_id = roles.id;
+/*'1','bob','bob@example.com','1','1','admin'
+'2','joe','joe@example.com','2','2','author'
+'3','sally','sally@example.com','3','3','reviewer'
+'4','adam','adam@example.com','3','3','reviewer'
+'5','jane','jane@example.com',NULL,NULL,NULL
+'6','mike','mike@example.com',NULL,NULL,NULL
+*/
 
 SELECT *
 from users
 right join roles on users.role_id = roles.id;
+/*'1','bob','bob@example.com','1','1','admin'
+'2','joe','joe@example.com','2','2','author'
+'3','sally','sally@example.com','3','3','reviewer'
+'4','adam','adam@example.com','3','3','reviewer'
+NULL,NULL,NULL,NULL,'4','commenter'
+*/
 
 # 3. Use count and the appropriate join type to get a list of roles along with the number of users that has the role
 
@@ -30,12 +58,17 @@ SELECT roles.name, count(role_id)
 from users
 right join roles on users.role_id = roles.id
 group by roles.name;
-
+/*'admin','1'
+'author','1'
+'reviewer','2'
+'commenter','0'
+*/
 
 ##PART TWO:
 # 1. Use the employees database
 
 USE employees;
+
 
 /* 2. write a query that shows each department along with the name of the current manager for that department.
 DEPARTMENT.         DEPARTMENT MANAGER
@@ -197,10 +230,8 @@ LIMIT 1;
 
 SELECT d.dept_name, ROUND(AVG(s.salary)) AS average_salary
 FROM departments As d
-JOIN dept_emp As de
-ON de.dept_no = d.dept_no
-JOIN salaries AS s 
-ON de.emp_no = s.emp_no
+JOIN dept_emp As de ON de.dept_no = d.dept_no
+JOIN salaries AS s ON de.emp_no = s.emp_no
 WHERE s.to_date > curdate()
 GROUP BY d.dept_name
 ORDER BY AVG(s.salary) DESC;
@@ -208,17 +239,15 @@ ORDER BY AVG(s.salary) DESC;
 
 ## Bonus Find the names of all current employees, their department name, and their current manager's name.
 
-select *, concat(e.first_name, " ", e.last_name) as "employee_name",
- dept_name, 
- concat(dm.first_name, " ", dm.last_name) as "manager_name"
+select concat(e.first_name, " ", e.last_name) as "employee_name",
+ d.dept_name as 'department name', concat(e.first_name, " ", e.last_name) as "manager_name"
  from employees as e
- join dept_emp  as de 
- on de.emp_no = e_emp_no
- join departments as d
- on d.dept_no = de.dept_no
+ join dept_emp  as de on de.emp_no = e.emp_no
+	and de.to_date > curdate()
+ join departments as d on d.dept_no = de.dept_no
  join dept_manager as dm
- on dm_emp_no = de.emp_no
- WHERE de.to_date > curdate()
+ on dm.emp_no = e.emp_no
+ WHERE dm.to_date > curdate()
  group by d.dept_name;
  
 
