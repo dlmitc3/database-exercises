@@ -195,12 +195,12 @@ LIMIT 1;
 # 10. Determine the average salary for each department. Use all salary information and round your results.
 
 
-select concat(employees.first_name, " ", employees.last_name) as "employee_name",
-dept_name, concat(managers.first_name, " ", managers.last_name) as "manager_name"
-from employees
-join dept_emp using(emp_no)
-join departments using(dept_no)
-join dept_manager using(dept_no)
-join employees as managers on managers.emp_no = dept_manager.emp.no
-where dept_manager.to_date > curdate()
-    and dept_emp.to_date > curdate();
+SELECT d.dept_name, ROUND(AVG(s.salary)) AS average_salary
+FROM departments As d
+JOIN dept_emp As de
+ON de.dept_no = d.dept_no
+JOIN salaries AS s 
+ON de.emp_no = s.emp_no
+WHERE s.to_date > curdate()
+GROUP BY d.dept_name
+ORDER BY AVG(s.salary) DESC;
