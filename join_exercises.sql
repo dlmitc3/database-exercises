@@ -204,3 +204,31 @@ ON de.emp_no = s.emp_no
 WHERE s.to_date > curdate()
 GROUP BY d.dept_name
 ORDER BY AVG(s.salary) DESC;
+
+
+## Bonus Find the names of all current employees, their department name, and their current manager's name.
+
+select *, concat(e.first_name, " ", e.last_name) as "employee_name",
+ dept_name, 
+ concat(dm.first_name, " ", dm.last_name) as "manager_name"
+ from employees as e
+ join dept_emp  as de 
+ on de.emp_no = e_emp_no
+ join departments as d
+ on d.dept_no = de.dept_no
+ join dept_manager as dm
+ on dm_emp_no = de.emp_no
+ WHERE de.to_date > curdate()
+ group by d.dept_name;
+ 
+
+
+ 
+ ## Bonus Who is the highest paid employee within each department.
+
+
+ 
+ 
+ 
+
+
