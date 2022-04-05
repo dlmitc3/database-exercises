@@ -49,7 +49,12 @@ SELECT COUNT(*) AS 'Former Employees'
          WHERE to_date > NOW());
 
 
-/* Find all the current department managers that are female. List their names in a comment in your code.*/
+/* Find all the current department managers that are female. List their names in a comment in your code.
+'Isamu Legleitner','F'
+'Karsten Sigstam','F'
+'Leon DasSarma','F'
+'Hilary Kambil','F'
+*/
 
 
 SELECT CONCAT(first_name,' ', last_name) AS 'Employee Name', gender
@@ -61,13 +66,13 @@ WHERE gender LIKE 'F' AND
 /* Find all the employees who currently have a higher salary than the companies overall, 
 historical average salary.*/
 
-SELECT CONCAT(first_name, ' ', last_name) AS 'Employee Name', salary
- from salaries
- where emp_no = (
-     select emp_no
-     from salaries)
-  and salaries.to_date > curdate()
-  Order by salary ASC;
+SELECT CONCAT(e.first_name, ' ', e.last_name) AS 'Employee Name'
+from employees as e
+join salaries on e.emp_no = salaries.emp_no
+Where salaries.to_date > CURDATE()
+and salary > (SELECT AVG(salary) 
+FROM salaries);
+ 
 
 /* How many current salaries are within 1 standard deviation of the current highest salary? 
 (Hint: you can use a built in function to calculate the standard deviation.) 
@@ -90,7 +95,12 @@ SELECT (COUNT(*) / (SELECT COUNT(*) FROM salaries WHERE to_date > NOW())) * 100
 */
  
         
-/* BONUS Find all the department names that currently have female managers. */
+/* BONUS Find all the department names that currently have female managers. 
+'Development'
+'Finance'
+'Human Resources'
+'Research'
+*/
 
 select dept_name
  from departments
@@ -103,31 +113,32 @@ select dept_name
  				from employees
  				where gender = "f"));
 
-/* BONUS Find the first and last name of the employee with the highest salary. */
+/* BONUS Find the first and last name of the employee with the highest salary. 
+'Tokuyasu Pesch'
+*/
 
- SELECT CONCAT(first_name,
-               ' ',
-               last_name) AS 'Employee Name'
-   FROM employees
-  WHERE emp_no = 
-  (
- 	   SELECT emp_no
+SELECT CONCAT(first_name, ' ', last_name) AS 'Employee Name'
+FROM employees
+WHERE emp_no = ( SELECT emp_no
           FROM salaries
  	    ORDER By salary DESC
-         LIMIT 1
-  );
+         LIMIT 1);
 
 
 /* Bonus: Find the department name that the employee with the highest salary works in.
+Answer: 'Sales'
 */
 
-select concat(first_name, " ", last_name) as "Employee", salary
- from employees 
- join salaries using(emp_no)
- where emp_no in (
- 		select emp_no
- 		from salaries
- 		where salary in (
- 				select Max(salary)
- 				from salaries
- 				where salaries.to_date > curdate()));
+SELECT DISTINCT(dept_name)
+FROM departments as d
+JOIN dept_emp as de
+ON de.dept_no = d.dept_no
+JOIN salaries as s
+ON s.emp_no = de.emp_no
+WHERE de.emp_no = (SELECT emp_no
+          FROM salaries
+ 	    ORDER By salary DESC
+         LIMIT 1);
+ 		
+
+
