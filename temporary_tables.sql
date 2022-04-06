@@ -5,7 +5,7 @@ it means that the query was attempting to write a new table to a database that y
 
 USE jemison_1746;
 
-drop table if exists employees_with_departments2;
+drop table if exists employees_with_departments;
 
 CREATE TEMPORARY TABLE employees_with_departments AS
 SELECT emp_no, first_name, last_name, dept_name, to_date
@@ -22,7 +22,7 @@ FROM employees_with_departments;
 length is the sum of the lengths of the first name and last name columns*/
 
 ALTER TABLE employees_with_departments
-ADD full_name VARCHAR(30);
+ADD full_name VARCHAR(31);
 
 /* b. Update the table so that full name column contains the correct data*/
 
@@ -40,6 +40,8 @@ DROP COLUMN last_name;
 
 
 /* d. What is another way you could have ended up with this same table?*/
+
+drop table if exists employees_with_departments2;
 
 CREATE TEMPORARY TABLE employees_with_departments2 AS
 SELECT emp_no, dept_name, to_date, CONCAT(first_name,'  ',last_name) AS full_name
@@ -81,20 +83,14 @@ FROM amount_paid;
 historical average pay. (In order to make the comparison easier, you should use the 
 Z-score for salaries).*/
 
-drop table if exists Pay_avg; 
-
-CREATE TEMPORARY TABLE Pay_avg AS
-SELECT emp_no, dept_name, CONCAT(first_name,'  ',last_name) AS full_name
-FROM employees.employees
-JOIN employees.dept_emp USING(emp_no)
-JOIN employees.departments USING(dept_no)
-limit 100;
-
-SELECT *
-FROM Pay_avg;
-
 drop table if exists Pay_avg2; 
 
+SELECT avg(salary), std(salary) from employees.salaries;
+
+create temporary table Hist_avgsalary as (SELECT avg(salary), std(salary) from employees.salaries);
+
+SELECT *
+FROM Hist_avgsalary;
 
 CREATE TEMPORARY TABLE Pay_avg2 AS
 SELECT AVG(salary), dept_name
@@ -106,13 +102,29 @@ GROUP BY dept_name;
 SELECT *
 FROM Pay_avg2;
 
-CREATE TEMPORARY TABLE Pay_avg3 AS
-SELECT AVG(salary), dept_name
+select avg(salary) as mean, stddev(sales) as sd
+from zscore;
+
+CREATE TEMPORARY TABLE current_info AS
+SELECT dept_name, AVG(salary) as dept_current_avg
 FROM employees.salaries
 JOIN employees.dept_emp USING(emp_no)
 JOIN employees.departments USING(dept_no)
-GROUP BY dept_name;
+where employees.dept_emp.to_date > curdate()
+and employees.salaries.to_date > curdate()
+group by dept_name;
 
+select * from current_info;
+
+alter table current_info add hist_avg float(10,2);
+alter table current_info add hist_std float(10,2);
+alter table current_info add zscore float(10.2);
+
+update current_info set hist_avg = (select avg_salary from hist_aggregrates);
+update current_info set hist_std= (select avg_salary from hist_aggregrates);
+
+update current_info
+SET zscore = (dept_current_avg - hist_avg) / hist_std;
 
 /*In terms of salary, what is the best department right now to work for? 
 The worst?
