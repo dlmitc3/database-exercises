@@ -57,24 +57,66 @@ FROM employees_with_departments2;
 drop table if exists amount_paid;
 
 CREATE TEMPORARY TABLE amount_paid AS
-SELECT payment_id, customer_id, amount, payment_date
+SELECT payment_id, customer_id, payment_date, amount
 FROM sakila.payment
 limit 100;
 
 SELECT *
 FROM amount_paid;
 
-ALTER TABLE amount_paid DROP COLUMN amount;
-
-ALTER TABLE amount_paid add new_amount;
-
-UPDATE amount_paid
-SET new_amount = amount INT(10);
-
 /* Write the SQL necessary to transform the amount column such that it is stored as 
-an integer representing the number of cents of the payment. For example, 1.99 should become 199.*/
+an integer representing the number of cents of the payment. For example, 1.99 should become 199.
+*/
+
+ALTER TABLE amount_paid ADD hole_amount int;
+
+UPDATE amount_paid SET hole_amount = amount * 100;
+
+ALTER TABLE amount_paid drop amount;
+
+SELECT *
+FROM amount_paid;
 
 /* 3. Find out how the current average pay in each department compares to the overall, 
-historical average pay. In order to make the comparison easier, you should use the 
-Z-score for salaries. In terms of salary, what is the best department right now to work for? 
-The worst?*/
+historical average pay. (In order to make the comparison easier, you should use the 
+Z-score for salaries).*/
+
+drop table if exists Pay_avg; 
+
+CREATE TEMPORARY TABLE Pay_avg AS
+SELECT emp_no, dept_name, CONCAT(first_name,'  ',last_name) AS full_name
+FROM employees.employees
+JOIN employees.dept_emp USING(emp_no)
+JOIN employees.departments USING(dept_no)
+limit 100;
+
+SELECT *
+FROM Pay_avg;
+
+drop table if exists Pay_avg2; 
+
+
+CREATE TEMPORARY TABLE Pay_avg2 AS
+SELECT AVG(salary), dept_name
+FROM employees.salaries
+JOIN employees.dept_emp USING(emp_no)
+JOIN employees.departments USING(dept_no)
+GROUP BY dept_name;
+
+SELECT *
+FROM Pay_avg2;
+
+CREATE TEMPORARY TABLE Pay_avg3 AS
+SELECT AVG(salary), dept_name
+FROM employees.salaries
+JOIN employees.dept_emp USING(emp_no)
+JOIN employees.departments USING(dept_no)
+GROUP BY dept_name;
+
+
+/*In terms of salary, what is the best department right now to work for? 
+The worst?
+BEST:SALES
+WORST:HUMAN RESOURSES*/
+
+
